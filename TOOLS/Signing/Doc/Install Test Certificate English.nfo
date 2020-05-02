@@ -1,0 +1,49 @@
+
+
+
+
+
+
+Enable the testsigning mode in the vista boot loader:
+
+bcdedit.exe /set TESTSIGNING ON
+
+
+These instructions are for the first time you sign a driver:
+
+1) Create the certificate:
+
+makecert.exe -$ individual  -r -pe -ss "WRFan Certificate Store" -n  CN="WRFan Treibersignierung" "WRFan Treibersignierung.cer"
+
+2) Install the certificate into the Trusted Root Certification Authorities store:
+
+certmgr.exe /add "WRFan Treibersignierung.cer" /s /r localMachine root
+
+or do it manually through the Certificate snap-in:
+
+%windir%\System32\certmgr.msc
+
+
+3) Sign the driver with the certificate:
+
+signtool.exe sign /v /s "WRFan Certificate Store" /n "WRFan Treibersignierung" BT848.sys
+
+4) Verify the signed driver validity:
+
+signtool.exe verify /pa /v BT848.sys
+
+5) Overwrite the original driver with the signed one and reboot your system. Changes to the vista boot loader require a reboot, if you already are in testsigning mode, you might open the device manager and re-activate the device that relies on the signed driver, then a reboot is not necessary
+
+--------------------
+
+For signing further drivers, repeat steps 3 + 4 + 5
+
+
+--------------------------
+Note:
+
+To kill stores that are not needed any longer, go here:
+
+HKEY_CURRENT_USER\Software\Microsoft\SystemCertificates
+
+Pay attention what stores you delete!
